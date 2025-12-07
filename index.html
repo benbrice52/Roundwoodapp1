@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roundwood Route Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2d5016;
+            --primary-light: #5a8a3a;
+            --primary-dark: #1a3009;
+            --accent: #8fbc5a;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 73px;
+            z-index: 90;
+        }
+
+        .nav-tabs-inner {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--gray-600);
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        /* Visit Cards */
+        .visits-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .visit-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .visit-card.active-visit {
+            border: 2px solid var(--primary);
+            background: linear-gradient(to bottom, #ffffff, #f0f7eb);
+        }
+
+        .timer-display {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--gray-300);
+        }
+
+        .visit-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .visit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .visit-site-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--gray-900);
+        }
+
+        .visit-date {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .visit-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-light);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .visit-details {
+            margin: 0.75rem 0;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .visit-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-invoiced {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-overdue {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Signature Pad */
+        .signature-pad {
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            background: var(--gray-50);
+            cursor: crosshair;
+        }
+
+        .signature-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* List Items */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item-info {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .list-item-meta {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .visit-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <h1>🌿 Roundwood Route Manager</h1>
+                <div class="header-subtitle">Grounds Maintenance Scheduling</div>
+            </div>
+            <div id="userInfo" style="text-align: right; display: none;">
+                <div style="font-size: 0.875rem; opacity: 0.9;" id="currentUser"></div>
+                <button class="btn btn-secondary" style="margin-top: 0.25rem; padding: 0.375rem 0.75rem; font-size: 0.75rem;" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="nav-tabs-inner">
+            <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
+            <button class="nav-tab" data-tab="upcoming">Upcoming Visits</button>
+            <button class="nav-tab" data-tab="sites">Sites</button>
+            <button class="nav-tab" data-tab="invoices">Invoice Tracking</button>
+            <button class="nav-tab" data-tab="completed">Completed</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-pane active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-sites">0</div>
+                        <div class="stat-label">Total Sites</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-upcoming">0</div>
+                        <div class="stat-label">Upcoming Visits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-pending-invoice">0</div>
+                        <div class="stat-label">Pending Invoices</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-this-week">0</div>
+                        <div class="stat-label">This Week</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Quick Actions</h2>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showAddSiteModal()">
+                            ➕ Add New Site
+                        </button>
+                        <button class="btn btn-secondary" onclick="switchTab('upcoming')">
+                            📅 View Upcoming Visits
+                        </button>
+                        <button class="btn btn-secondary" onclick="switchTab('invoices')">
+                            💰 Track Invoices
+                        </button>
+                        <button class="btn btn-secondary" onclick="switchTab('sites')">
+                            🏢 Manage Sites
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Visits Tab -->
+            <div id="upcoming" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Next Visit</h2>
+                    </div>
+                    <div id="upcoming-visits-list" class="visits-grid">
+                        <!-- Next visit will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Future Visits</h2>
+                    </div>
+                    <div id="future-visits-list">
+                        <!-- Future visits will be populated here as a simple list -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sites Tab -->
+            <div id="sites" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Sites</h2>
+                        <button class="btn btn-primary" onclick="showAddSiteModal()">
+                            ➕ Add Site
+                        </button>
+                    </div>
+                    <div id="sites-list">
+                        <!-- Sites will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice Tracking Tab -->
+            <div id="invoices" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Invoice Tracking</h2>
+                    </div>
+                    <div id="invoices-list">
+                        <!-- Invoices will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Tab -->
+            <div id="completed" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Completed Visits</h2>
+                    </div>
+                    <div id="completed-list">
+                        <!-- Completed visits will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal active">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">🌿 Roundwood Route Manager</h3>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <div id="loginFormContainer" style="display: block;">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="loginEmail" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" required autocomplete="current-password">
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-primary" onclick="handleLogin()" style="width: 100%;">Login</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button type="button" class="btn btn-secondary" onclick="showRegisterForm()" style="width: 100%;">
+                            Create New Account
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="registerFormContainer" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="registerName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" id="registerEmail" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="registerPassword" required minlength="6" autocomplete="new-password">
+                        <small style="color: var(--gray-600); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            Must be at least 6 characters
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-input" id="registerPasswordConfirm" required minlength="6" autocomplete="new-password">
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-success" onclick="handleRegister()" style="width: 100%;">Create Account</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button type="button" class="btn btn-secondary" onclick="showLoginForm()" style="width: 100%;">
+                            Back to Login
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="firstUserNotice" style="margin-top: 1.5rem; padding: 1rem; background: var(--accent); color: white; border-radius: 6px; font-size: 0.875rem; display: none;">
+                    <strong>👑 First User Setup</strong><br>
+                    The first account created will automatically become the administrator with full access.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Site Modal -->
+    <div id="addSiteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Site</h3>
+                <button class="modal-close" onclick="closeModal('addSiteModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="addSiteForm">
+                    <div class="form-group">
+                        <label class="form-label">Site Name *</label>
+                        <input type="text" class="form-input" id="siteName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Address *</label>
+                        <textarea class="form-textarea" id="siteAddress" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Services</label>
+                        <div class="checkbox-group" id="servicesCheckboxes">
+                            <!-- Will be populated with services -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Visit Schedule</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label class="form-label">Long Visits/Year</label>
+                                <input type="number" class="form-input" id="longVisits" min="0" value="3">
+                            </div>
+                            <div>
+                                <label class="form-label">Short Visits/Year</label>
+                                <input type="number" class="form-input" id="shortVisits" min="0" value="9">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">First Visit Date *</label>
+                        <input type="date" class="form-input" id="firstVisit" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-textarea" id="siteNotes"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addSiteModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSite()">Add Site</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Visit Modal -->
+    <div id="completeVisitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Complete Visit</h3>
+                <button class="modal-close" onclick="closeModal('completeVisitModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="completeVisitForm">
+                    <input type="hidden" id="visitId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Staff Member *</label>
+                        <input type="text" class="form-input" id="staffMember" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Time Spent (hours)</label>
+                        <input type="number" step="0.5" class="form-input" id="timeSpent" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Work Completed</label>
+                        <textarea class="form-textarea" id="workNotes" placeholder="Describe the work completed..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Before Photos</label>
+                        <input type="file" class="form-input" id="beforePhotos" accept="image/*" multiple>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">After Photos</label>
+                        <input type="file" class="form-input" id="afterPhotos" accept="image/*" multiple>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Customer Signature</label>
+                        <canvas id="signaturePad" class="signature-pad" width="500" height="200"></canvas>
+                        <div class="signature-controls">
+                            <button type="button" class="btn btn-secondary" onclick="clearSignature()">Clear</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('completeVisitModal')">Cancel</button>
+                <button class="btn btn-success" onclick="completeVisit()">Complete & Notify Accounts</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Services list from the flyer
+        const SERVICES = [
+            'Regular Grass Cutting',
+            'Hedge Trimming',
+            'Weed Control',
+            'Border Maintenance',
+            'Leaf Clearing',
+            'Seasonal Planting',
+            'Litter Picking',
+            'Car Park Maintenance',
+            'Sports Pitch Line Marking',
+            'Forest School Maintenance',
+            'Tree Surveys'
+        ];
+
+        // Data storage
+        let sites = JSON.parse(localStorage.getItem('sites') || '[]');
+        let visits = JSON.parse(localStorage.getItem('visits') || '[]');
+        let completedVisits = JSON.parse(localStorage.getItem('completedVisits') || '[]');
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        let currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+
+        // Signature pad
+        let signaturePad = null;
+        let isDrawing = false;
+
+        // Visit timer
+        let activeVisit = null;
+        let timerInterval = null;
+        let visitStartTime = null;
+        let beforePhotos = [];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initializing...');
+            initializeServiceCheckboxes();
+            initializeTabs();
+            initializeSignaturePad();
+            restoreActiveVisit();
+            checkAuth();
+        });
+
+        function checkAuth() {
+            // Show first user notice if no users exist
+            if (users.length === 0) {
+                document.getElementById('firstUserNotice').style.display = 'block';
+            }
+
+            if (!currentUser) {
+                document.getElementById('loginModal').classList.add('active');
+                document.querySelector('.nav-tabs').style.display = 'none';
+                document.querySelector('.main-content').style.display = 'none';
+            } else {
+                document.getElementById('loginModal').classList.remove('active');
+                document.querySelector('.nav-tabs').style.display = 'block';
+                document.querySelector('.main-content').style.display = 'block';
+                updateUIForRole();
+                renderAll();
+            }
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('registerFormContainer').style.display = 'none';
+            // Clear inputs
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginFormContainer').style.display = 'none';
+            document.getElementById('registerFormContainer').style.display = 'block';
+            // Clear inputs
+            document.getElementById('registerName').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+            document.getElementById('registerPasswordConfirm').value = '';
+            
+            // Show first user notice if no users exist
+            if (users.length === 0) {
+                document.getElementById('firstUserNotice').style.display = 'block';
+            } else {
+                document.getElementById('firstUserNotice').style.display = 'none';
+            }
+        }
+
+        function handleRegister() {
+            console.log('Register button clicked!');
+            
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            console.log('Name:', name, 'Email:', email);
+
+            // Validation
+            if (!name) {
+                alert('Please enter your full name!');
+                return;
+            }
+
+            if (!email) {
+                alert('Please enter your email address!');
+                return;
+            }
+
+            if (!password) {
+                alert('Please enter a password!');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                alert('An account with this email already exists!');
+                return;
+            }
+
+            // First user becomes admin, others become staff
+            const role = users.length === 0 ? 'admin' : 'staff';
+
+            const newUser = {
+                id: Date.now(),
+                email,
+                password, // In a real app, this would be hashed
+                name,
+                role,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            console.log('User created:', newUser);
+            console.log('Total users now:', users.length);
+
+            alert(`✅ Account created successfully!${role === 'admin' ? '\n\n👑 You are the first user and have been granted administrator access.' : ''}\n\nYou can now login with your email and password.`);
+            
+            showLoginForm();
+        }
+
+        function handleLogin() {
+            console.log('Login button clicked!');
+            
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            console.log('Email:', email);
+            console.log('Total users:', users.length);
+
+            if (!email) {
+                alert('Please enter your email address!');
+                return;
+            }
+
+            if (!password) {
+                alert('Please enter your password!');
+                return;
+            }
+
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                console.log('User found!', user);
+                currentUser = { 
+                    id: user.id,
+                    email: user.email, 
+                    role: user.role, 
+                    name: user.name 
+                };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                checkAuth();
+            } else {
+                console.log('User not found');
+                if (users.length === 0) {
+                    alert('No accounts exist yet. Please create an account first!');
+                } else {
+                    alert('Invalid email or password. Please try again.');
+                }
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                sessionStorage.removeItem('currentUser');
+                checkAuth();
+            }
+        }
+
+        function updateUIForRole() {
+            const isAdmin = currentUser.role === 'admin';
+            
+            // Update user info display
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('currentUser').innerHTML = `
+                <strong>${currentUser.name}</strong><br>
+                <span style="font-size: 0.75rem;">${currentUser.email}</span><br>
+                <span style="font-size: 0.75rem;">${isAdmin ? '👑 Administrator' : '👤 Staff Member'}</span>
+            `;
+
+            // Show/hide admin-only elements
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = isAdmin ? '' : 'none';
+            });
+
+            // If staff, switch to upcoming visits tab
+            if (!isAdmin) {
+                switchTab('upcoming');
+            }
+        }
+
+        function initializeServiceCheckboxes() {
+            const container = document.getElementById('servicesCheckboxes');
+            SERVICES.forEach(service => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="service-${service.replace(/\s+/g, '-')}" value="${service}">
+                    <label for="service-${service.replace(/\s+/g, '-')}">${service}</label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function initializeTabs() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            renderAll();
+        }
+
+        function initializeSignaturePad() {
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+            
+            signaturePad = { canvas, ctx };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = signaturePad.canvas.getBoundingClientRect();
+            signaturePad.ctx.beginPath();
+            signaturePad.ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = signaturePad.canvas.getBoundingClientRect();
+            signaturePad.ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            signaturePad.ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            signaturePad.canvas.dispatchEvent(mouseEvent);
+        }
+
+        function clearSignature() {
+            signaturePad.ctx.clearRect(0, 0, signaturePad.canvas.width, signaturePad.canvas.height);
+        }
+
+        function showAddSiteModal() {
+            document.getElementById('addSiteModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'addSiteModal') {
+                document.getElementById('addSiteForm').reset();
+            }
+            if (modalId === 'completeVisitModal') {
+                document.getElementById('completeVisitForm').reset();
+                clearSignature();
+            }
+        }
+
+        function saveSite() {
+            const name = document.getElementById('siteName').value;
+            const address = document.getElementById('siteAddress').value;
+            const longVisits = parseInt(document.getElementById('longVisits').value);
+            const shortVisits = parseInt(document.getElementById('shortVisits').value);
+            const firstVisit = document.getElementById('firstVisit').value;
+            const notes = document.getElementById('siteNotes').value;
+            
+            const selectedServices = [];
+            document.querySelectorAll('#servicesCheckboxes input[type="checkbox"]:checked').forEach(cb => {
+                selectedServices.push(cb.value);
+            });
+
+            const site = {
+                id: Date.now(),
+                name,
+                address,
+                services: selectedServices,
+                longVisits,
+                shortVisits,
+                notes,
+                createdAt: new Date().toISOString(),
+                createdBy: currentUser.email
+            };
+
+            sites.push(site);
+            localStorage.setItem('sites', JSON.stringify(sites));
+
+            // Create initial visits
+            generateVisitsForSite(site, new Date(firstVisit));
+
+            closeModal('addSiteModal');
+            renderAll();
+            alert('Site added successfully!');
+        }
+
+        function generateVisitsForSite(site, startDate) {
+            const totalVisits = site.longVisits + site.shortVisits;
+            const daysBetween = Math.floor(365 / totalVisits);
+            
+            let visitDate = new Date(startDate);
+            
+            // Add long visits first
+            for (let i = 0; i < site.longVisits; i++) {
+                visits.push({
+                    id: Date.now() + i,
+                    siteId: site.id,
+                    siteName: site.name,
+                    address: site.address,
+                    type: 'Long Visit',
+                    date: visitDate.toISOString().split('T')[0],
+                    status: 'scheduled',
+                    invoiceStatus: 'pending'
+                });
+                visitDate.setDate(visitDate.getDate() + daysBetween);
+            }
+            
+            // Add short visits
+            for (let i = 0; i < site.shortVisits; i++) {
+                visits.push({
+                    id: Date.now() + site.longVisits + i,
+                    siteId: site.id,
+                    siteName: site.name,
+                    address: site.address,
+                    type: 'Short Visit',
+                    date: visitDate.toISOString().split('T')[0],
+                    status: 'scheduled',
+                    invoiceStatus: 'pending'
+                });
+                visitDate.setDate(visitDate.getDate() + daysBetween);
+            }
+            
+            localStorage.setItem('visits', JSON.stringify(visits));
+        }
+
+        function showCompleteVisitModal(visitId) {
+            document.getElementById('visitId').value = visitId;
+            
+            // Pre-fill staff member name if user is staff
+            if (currentUser.role === 'staff') {
+                document.getElementById('staffMember').value = currentUser.name;
+            }
+
+            // If there's an active visit with this ID, auto-fill the time
+            if (activeVisit && activeVisit.id === visitId && visitStartTime) {
+                const elapsed = (new Date() - new Date(visitStartTime)) / (1000 * 60 * 60); // hours
+                document.getElementById('timeSpent').value = elapsed.toFixed(2);
+            }
+
+            // Hide the before photos section since we already have them
+            const beforePhotosGroup = document.getElementById('beforePhotos').closest('.form-group');
+            if (beforePhotos.length > 0) {
+                beforePhotosGroup.style.display = 'none';
+            } else {
+                beforePhotosGroup.style.display = 'block';
+            }
+            
+            document.getElementById('completeVisitModal').classList.add('active');
+        }
+
+        function completeVisit() {
+            const visitId = parseInt(document.getElementById('visitId').value);
+            const staffMember = document.getElementById('staffMember').value;
+            const timeSpent = document.getElementById('timeSpent').value;
+            const workNotes = document.getElementById('workNotes').value;
+            
+            if (!staffMember) {
+                alert('Please enter staff member name');
+                return;
+            }
+
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) return;
+
+            // Get signature
+            const signatureData = signaturePad.canvas.toDataURL();
+
+            // Get after photos
+            const afterPhotosInput = document.getElementById('afterPhotos');
+            const afterPhotosFiles = afterPhotosInput.files;
+
+            // Process after photos
+            const processPhotos = async () => {
+                const afterPhotosBase64 = [];
+                for (const file of afterPhotosFiles) {
+                    const base64 = await fileToBase64(file);
+                    afterPhotosBase64.push(base64);
+                }
+
+                // Move to completed
+                const completedVisit = {
+                    ...visit,
+                    completedAt: new Date().toISOString(),
+                    staffMember,
+                    timeSpent,
+                    workNotes,
+                    signature: signatureData,
+                    beforePhotos: beforePhotos,
+                    afterPhotos: afterPhotosBase64,
+                    invoiceStatus: 'awaiting_invoice',
+                    completedBy: currentUser.email
+                };
+
+                completedVisits.push(completedVisit);
+                visits = visits.filter(v => v.id !== visitId);
+
+                // Schedule next visit
+                const site = sites.find(s => s.id === visit.siteId);
+                if (site) {
+                    const nextDate = new Date(visit.date);
+                    const totalVisits = site.longVisits + site.shortVisits;
+                    const daysBetween = Math.floor(365 / totalVisits);
+                    nextDate.setDate(nextDate.getDate() + daysBetween);
+
+                    visits.push({
+                        id: Date.now(),
+                        siteId: site.id,
+                        siteName: site.name,
+                        address: site.address,
+                        type: visit.type,
+                        date: nextDate.toISOString().split('T')[0],
+                        status: 'scheduled',
+                        invoiceStatus: 'pending'
+                    });
+                }
+
+                localStorage.setItem('visits', JSON.stringify(visits));
+                localStorage.setItem('completedVisits', JSON.stringify(completedVisits));
+
+                // Clear active visit
+                if (activeVisit && activeVisit.id === visitId) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    activeVisit = null;
+                    visitStartTime = null;
+                    beforePhotos = [];
+                    localStorage.removeItem('activeVisit');
+                }
+
+                // Send email to accounts team
+                await sendCompletionEmail(completedVisit);
+
+                // Simulate notification to accounts
+                alert('✅ Visit completed!\n\n📧 Email sent to Office@roundwoodsolutions.co.uk with visit details for invoicing.');
+
+                closeModal('completeVisitModal');
+                renderAll();
+            };
+
+            processPhotos();
+        }
+
+        async function sendCompletionEmail(visit) {
+            // Format the email content
+            const emailSubject = `Invoice Required: ${visit.siteName} - ${visit.type} Completed`;
+            
+            const emailBody = `
+Visit Completion Details
+========================
+
+Site Information:
+- Site Name: ${visit.siteName}
+- Address: ${visit.address}
+- Visit Type: ${visit.type}
+
+Work Details:
+- Completed By: ${visit.staffMember}
+- Completed On: ${new Date(visit.completedAt).toLocaleString('en-GB')}
+- Time Spent: ${visit.timeSpent ? visit.timeSpent + ' hours' : 'Not recorded'}
+
+Work Notes:
+${visit.workNotes || 'No notes provided'}
+
+Documentation:
+- Before Photos: ${visit.beforePhotos?.length || 0} photo(s)
+- After Photos: ${visit.afterPhotos?.length || 0} photo(s)
+- Customer Signature: ${visit.signature ? 'Received' : 'Not received'}
+
+Please prepare and send invoice to the customer.
+
+---
+This notification was generated automatically by Roundwood Route Manager.
+            `.trim();
+
+            // Create mailto link
+            const mailto = `mailto:Office@roundwoodsolutions.co.uk?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            // Open email client
+            window.location.href = mailto;
+            
+            // Small delay to allow the mailto to trigger
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        function markInvoiceSent(visitId) {
+            if (currentUser.role !== 'admin') {
+                alert('Only administrators can manage invoices.');
+                return;
+            }
+            
+            const visit = completedVisits.find(v => v.id === visitId);
+            if (visit) {
+                visit.invoiceStatus = 'invoiced';
+                visit.invoicedAt = new Date().toISOString();
+                visit.invoicedBy = currentUser.username;
+                localStorage.setItem('completedVisits', JSON.stringify(completedVisits));
+                renderAll();
+                alert('Invoice marked as sent!');
+            }
+        }
+
+        function deleteSite(siteId) {
+            if (confirm('Are you sure you want to delete this site? This will also remove all associated visits.')) {
+                sites = sites.filter(s => s.id !== siteId);
+                visits = visits.filter(v => v.siteId !== siteId);
+                completedVisits = completedVisits.filter(v => v.siteId !== siteId);
+                
+                localStorage.setItem('sites', JSON.stringify(sites));
+                localStorage.setItem('visits', JSON.stringify(visits));
+                localStorage.setItem('completedVisits', JSON.stringify(completedVisits));
+                
+                renderAll();
+            }
+        }
+
+        function renderAll() {
+            renderStats();
+            renderUpcomingVisits();
+            renderSites();
+            renderInvoices();
+            renderCompleted();
+        }
+
+        function renderStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const weekFromNow = new Date();
+            weekFromNow.setDate(weekFromNow.getDate() + 7);
+            const weekEnd = weekFromNow.toISOString().split('T')[0];
+
+            document.getElementById('stat-total-sites').textContent = sites.length;
+            document.getElementById('stat-upcoming').textContent = visits.filter(v => v.status === 'scheduled').length;
+            document.getElementById('stat-pending-invoice').textContent = completedVisits.filter(v => v.invoiceStatus === 'awaiting_invoice').length;
+            document.getElementById('stat-this-week').textContent = visits.filter(v => v.date >= today && v.date <= weekEnd).length;
+        }
+
+        function renderUpcomingVisits() {
+            const container = document.getElementById('upcoming-visits-list');
+            const futureContainer = document.getElementById('future-visits-list');
+            const upcomingVisits = visits
+                .filter(v => v.status === 'scheduled')
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (upcomingVisits.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <div class="empty-state-title">No upcoming visits</div>
+                        <p>Add a site to schedule visits</p>
+                    </div>
+                `;
+                futureContainer.innerHTML = '';
+                return;
+            }
+
+            // Show only the next visit in the main section
+            const nextVisit = upcomingVisits[0];
+            const isOverdue = new Date(nextVisit.date) < new Date();
+            const isActive = activeVisit && activeVisit.id === nextVisit.id;
+
+            container.innerHTML = `
+                <div class="visit-card ${isActive ? 'active-visit' : ''}">
+                    <div class="visit-header">
+                        <div>
+                            <div class="visit-site-name">${nextVisit.siteName}</div>
+                            <div class="visit-date">📅 ${formatDate(nextVisit.date)}</div>
+                            <span class="visit-type">${nextVisit.type}</span>
+                            ${isOverdue ? '<span class="badge badge-overdue" style="margin-left: 0.5rem;">Overdue</span>' : ''}
+                            ${isActive ? '<span class="badge badge-success" style="margin-left: 0.5rem; background: var(--success);">In Progress</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="visit-details">
+                        📍 ${nextVisit.address}
+                    </div>
+                    ${isActive ? `
+                        <div class="timer-display" id="timer-${nextVisit.id}">
+                            00:00:00
+                        </div>
+                        ${beforePhotos.length > 0 ? `
+                            <div style="margin: 1rem 0;">
+                                <strong>Before Photos (${beforePhotos.length}):</strong>
+                                <div class="photo-preview" id="before-photos-preview"></div>
+                            </div>
+                        ` : ''}
+                    ` : ''}
+                    <div class="visit-actions">
+                        ${!isActive ? `
+                            <button class="btn btn-primary" onclick="startVisit(${nextVisit.id})">
+                                ▶️ Start Visit
+                            </button>
+                        ` : `
+                            <button class="btn btn-success" onclick="showCompleteVisitModal(${nextVisit.id})">
+                                ✓ Complete Visit
+                            </button>
+                            <button class="btn btn-secondary" onclick="cancelVisit()">
+                                ✕ Cancel Timer
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+
+            // Show remaining visits in a simple list
+            if (upcomingVisits.length > 1) {
+                futureContainer.innerHTML = upcomingVisits.slice(1).map(visit => {
+                    const isOverdue = new Date(visit.date) < new Date();
+                    return `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <div class="list-item-title">${visit.siteName} - ${visit.type}</div>
+                                <div class="list-item-meta">
+                                    📅 ${formatDate(visit.date)} | 📍 ${visit.address}
+                                    ${isOverdue ? '<span class="badge badge-overdue" style="margin-left: 0.5rem;">Overdue</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                futureContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <div class="empty-state-title">All caught up!</div>
+                        <p>No other visits scheduled yet</p>
+                    </div>
+                `;
+            }
+
+            // If there's an active visit, update the timer display
+            if (isActive) {
+                updateTimerDisplay();
+                displayBeforePhotos();
+            }
+        }
+
+        function startVisit(visitId) {
+            const visit = visits.find(v => v.id === visitId);
+            if (!visit) return;
+
+            // Create file input for before photos
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.capture = 'environment'; // Suggest camera on mobile
+
+            input.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                
+                if (files.length === 0) {
+                    if (!confirm('No photos selected. Start visit without before photos?')) {
+                        return;
+                    }
+                }
+
+                // Convert files to base64
+                beforePhotos = [];
+                for (const file of files) {
+                    const base64 = await fileToBase64(file);
+                    beforePhotos.push(base64);
+                }
+
+                // Start the timer
+                activeVisit = visit;
+                visitStartTime = new Date();
+                
+                // Start interval to update timer every second
+                timerInterval = setInterval(updateTimerDisplay, 1000);
+
+                // Save to localStorage in case of page reload
+                localStorage.setItem('activeVisit', JSON.stringify({
+                    visit: activeVisit,
+                    startTime: visitStartTime.toISOString(),
+                    beforePhotos: beforePhotos
+                }));
+
+                renderAll();
+                alert(`✅ Visit started!\n\nTimer is now running. Take your time completing the work.`);
+            };
+
+            input.click();
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateTimerDisplay() {
+            if (!activeVisit || !visitStartTime) return;
+
+            const now = new Date();
+            const elapsed = Math.floor((now - new Date(visitStartTime)) / 1000); // seconds
+            
+            const hours = Math.floor(elapsed / 3600);
+            const minutes = Math.floor((elapsed % 3600) / 60);
+            const seconds = elapsed % 60;
+
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            const timerElement = document.getElementById(`timer-${activeVisit.id}`);
+            if (timerElement) {
+                timerElement.textContent = display;
+            }
+        }
+
+        function displayBeforePhotos() {
+            const container = document.getElementById('before-photos-preview');
+            if (!container || beforePhotos.length === 0) return;
+
+            container.innerHTML = beforePhotos.map((photo, index) => `
+                <img src="${photo}" alt="Before photo ${index + 1}">
+            `).join('');
+        }
+
+        function cancelVisit() {
+            if (!confirm('Are you sure you want to cancel this visit? The timer will be reset.')) {
+                return;
+            }
+
+            clearInterval(timerInterval);
+            timerInterval = null;
+            activeVisit = null;
+            visitStartTime = null;
+            beforePhotos = [];
+            
+            localStorage.removeItem('activeVisit');
+            renderAll();
+        }
+
+        // Restore active visit on page load
+        function restoreActiveVisit() {
+            const saved = localStorage.getItem('activeVisit');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    activeVisit = data.visit;
+                    visitStartTime = new Date(data.startTime);
+                    beforePhotos = data.beforePhotos || [];
+                    timerInterval = setInterval(updateTimerDisplay, 1000);
+                } catch (e) {
+                    console.error('Failed to restore active visit:', e);
+                    localStorage.removeItem('activeVisit');
+                }
+            }
+        }
+
+        function renderSites() {
+            const container = document.getElementById('sites-list');
+            
+            if (sites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏢</div>
+                        <div class="empty-state-title">No sites yet</div>
+                        <p>Click "Add Site" to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = sites.map(site => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${site.name}</div>
+                        <div class="list-item-meta">
+                            📍 ${site.address}<br>
+                            📅 ${site.longVisits} long visits, ${site.shortVisits} short visits/year<br>
+                            ${site.services.length > 0 ? '🔧 ' + site.services.join(', ') : ''}
+                        </div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-danger" onclick="deleteSite(${site.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderInvoices() {
+            const container = document.getElementById('invoices-list');
+            const pendingInvoices = completedVisits.filter(v => v.invoiceStatus === 'awaiting_invoice');
+
+            if (pendingInvoices.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💰</div>
+                        <div class="empty-state-title">All caught up!</div>
+                        <p>No pending invoices</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = pendingInvoices.map(visit => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${visit.siteName} - ${visit.type}</div>
+                        <div class="list-item-meta">
+                            ✅ Completed: ${formatDate(visit.completedAt.split('T')[0])}<br>
+                            👤 Staff: ${visit.staffMember}<br>
+                            📍 ${visit.address}
+                        </div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-success" onclick="markInvoiceSent(${visit.id})">
+                            ✓ Invoice Sent
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCompleted() {
+            const container = document.getElementById('completed-list');
+            const recentCompleted = completedVisits
+                .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+                .slice(0, 20);
+
+            if (recentCompleted.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <div class="empty-state-title">No completed visits yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = recentCompleted.map(visit => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${visit.siteName} - ${visit.type}</div>
+                        <div class="list-item-meta">
+                            ✅ ${formatDate(visit.completedAt.split('T')[0])} by ${visit.staffMember}<br>
+                            ${visit.timeSpent ? `⏱️ ${visit.timeSpent} hours` : ''}<br>
+                            ${visit.workNotes ? `📝 ${visit.workNotes}` : ''}<br>
+                            ${visit.beforePhotos && visit.beforePhotos.length > 0 ? `📸 ${visit.beforePhotos.length} before photos` : ''}
+                            ${visit.afterPhotos && visit.afterPhotos.length > 0 ? ` | ${visit.afterPhotos.length} after photos` : ''}<br>
+                            <span class="badge ${visit.invoiceStatus === 'invoiced' ? 'badge-invoiced' : 'badge-pending'}">
+                                ${visit.invoiceStatus === 'invoiced' ? 'Invoiced' : 'Awaiting Invoice'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB', { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+    </script>
+</body>
+</html>
